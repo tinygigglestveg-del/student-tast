@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>منصة استبيان الطموحات والمهارات المهنية للطلاب</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SheetJS for Excel Export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- System fallback Arabic Fonts -->
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cairo", "Tajawal", "Noto Sans Arabic", Tahoma, Arial, sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-emerald-600 selection:text-white">
+
+  <!-- TOP HEADER (تصميم هادئ وبسيط واحترافي) -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <div onclick="switchView('register')" class="flex items-center gap-3.5 cursor-pointer group">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-500 flex items-center justify-center text-white shadow-sm font-black text-lg group-hover:scale-105 transition-transform">
+          ✓
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">منصة استبيان الطلاب</h1>
+          <p class="text-xs text-slate-500 font-medium">استطلاع الطموحات والتحديات المهنية</p>
+        </div>
+      </div>
+
+      <!-- زر تسجيل دخول عادي وأنيق بدون زحمة أو أزرار مشرف ظاهرة للجميع -->
+      <div class="flex items-center gap-2">
+        <button id="navLoginBtn" onclick="switchView('login')" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold border border-slate-200 hover:border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-xs">
+          <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+          <span id="navLoginLabel">تسجيل الدخول</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 py-8 sm:py-12 px-4 sm:px-6 lg:px-8 max-w-7xl w-full mx-auto">
+
+    <!-- VIEW 1: REGISTRATION -->
+    <section id="view-register" class="max-w-2xl mx-auto">
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+        <div class="bg-gradient-to-l from-slate-900 via-slate-800 to-emerald-950 p-6 sm:p-8 text-white">
+          <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 mb-3">
+            استبيان رسمي وموثق للطلاب
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold mb-2">مرحباً بك في استبيان الطموحات المهنية</h2>
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+            نسعى من خلال هذا الاستبيان المكون من 10 أسئلة إلى فهم طموحاتك المهنية، مهاراتك الحالية، والتحديات التي تواجهك في سوق العمل لتقديم الدعم والتوجيه الأنسب لك.
+          </p>
+        </div>
+
+        <form id="regForm" onsubmit="handleRegistration(event)" class="p-6 sm:p-8 space-y-5" novalidate>
+          <div id="regAlert" class="hidden p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-sm font-bold"></div>
+
+          <div>
+            <label class="block text-sm font-bold text-slate-800 mb-2">1. الاسم الكامل (Full Name) <span class="text-red-500">*</span></label>
+            <input id="regName" type="text" required placeholder="أدخل اسمك الثلاثي أو الرباعي بالكامل..." class="w-full px-4 py-3.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-emerald-600 focus:outline-none font-medium" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-slate-800 mb-2">2. الرقم الجامعي / كود الطالب (Student ID) <span class="text-red-500">*</span></label>
+            <input id="regStudentId" type="text" dir="ltr" required placeholder="مثال: 202410589" class="w-full px-4 py-3.5 rounded-xl border border-slate-300 bg-slate-50 text-right focus:bg-white focus:border-emerald-600 focus:outline-none font-medium" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-bold text-slate-800 mb-2">3. البريد الإلكتروني (Email Address) <span class="text-red-500">*</span></label>
+            <input id="regEmail" type="email" dir="ltr" required placeholder="student@example.com" class="w-full px-4 py-3.5 rounded-xl border border-slate-300 bg-slate-50 text-right focus:bg-white focus:border-emerald-600 focus:outline-none font-medium" />
+            <p class="mt-1.5 text-xs text-slate-500">سيتم إرسال كود تحقق مكون من 6 أرقام إلى هذا البريد لتأكيد هويتك قبل بدء الاستبيان.</p>
+          </div>
+
+          <button id="regSubmitBtn" type="submit" class="w-full py-4 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base shadow-lg transition-all cursor-pointer">
+            متابعة وإرسال كود التحقق للبريد الإلكتروني ←
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- VIEW 2: EMAIL VERIFICATION -->
+    <section id="view-verify" class="hidden max-w-xl mx-auto">
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-8 space-y-6 text-center">
+        <h2 class="text-2xl font-extrabold text-slate-900">تأكيد البريد الإلكتروني</h2>
+        <p class="text-sm text-slate-600">
+          تم إرسال كود التحقق المكون من 6 أرقام إلى بريدك الإلكتروني:
+          <strong id="verifyEmailLabel" class="block text-emerald-700 mt-1" dir="ltr"></strong>
+        </p>
+
+        <div id="otpAlert" class="hidden p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-sm font-bold"></div>
+
+        <form onsubmit="handleVerifyOtp(event)" class="space-y-5">
+          <input id="otpInput" type="text" inputmode="numeric" maxlength="6" dir="ltr" placeholder="• • • • • •" class="w-full py-4 px-6 text-center text-3xl font-extrabold tracking-[0.5em] rounded-2xl border-2 border-slate-300 bg-slate-50 focus:bg-white focus:border-emerald-600 focus:outline-none" />
+          <button type="submit" class="w-full py-4 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base shadow-lg cursor-pointer">
+            تأكيد الكود وبدء الاستبيان
+          </button>
+        </form>
+
+        <div class="pt-4 border-t border-slate-200 flex items-center justify-between text-xs sm:text-sm">
+          <button onclick="resendOtpCode()" id="resendBtn" class="font-bold text-emerald-700 hover:underline cursor-pointer">إعادة إرسال كود جديد</button>
+          <button onclick="switchView('register')" class="text-slate-500 hover:text-slate-800 font-semibold cursor-pointer">تعديل البريد الإلكتروني</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: 10-QUESTION SURVEY -->
+    <section id="view-survey" class="hidden max-w-3xl mx-auto space-y-6">
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-10 space-y-8">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span id="qCounterBadge" class="px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 font-extrabold text-sm border border-emerald-200">السؤال 1 من 10</span>
+            <span id="qProgressLabel" class="text-sm font-bold text-slate-600">نسبة الإنجاز: 0%</span>
+          </div>
+          <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+            <div id="qProgressBar" class="h-full bg-emerald-600 transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div id="surveyAlert" class="hidden p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-sm font-bold"></div>
+
+        <div class="py-2">
+          <h3 id="questionText" class="text-xl sm:text-2xl font-extrabold text-slate-900 leading-relaxed"></h3>
+          <p class="text-xs sm:text-sm text-slate-500 mt-2">يرجى اختيار إجابة واحدة (جميع الأسئلة إلزامية):</p>
+        </div>
+
+        <div id="answerOptionsContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
+
+        <div class="pt-6 border-t border-slate-200 flex items-center justify-between gap-4">
+          <button id="prevQBtn" onclick="navigateQuestion(-1)" class="px-5 py-3 rounded-xl border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-100 cursor-pointer">
+            → السابق
+          </button>
+          <div class="flex items-center gap-3">
+            <button id="nextQBtn" onclick="navigateQuestion(1)" class="px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm cursor-pointer">
+              التالي ←
+            </button>
+            <button id="submitSurveyBtn" onclick="submitFullSurvey()" class="hidden px-7 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm sm:text-base shadow-lg cursor-pointer">
+              إرسال الاستبيان النهائي ✓
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: THANK YOU -->
+    <section id="view-thankyou" class="hidden max-w-2xl mx-auto">
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-xl p-8 sm:p-10 text-center space-y-6">
+        <div class="w-20 h-20 rounded-3xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-4xl font-extrabold">✓</div>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">شكراً جزيلاً لمشاركتك!</h2>
+        <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+          تم تسجيل إجاباتك العشر بنجاح في جدول Google Sheets المركزي وإرسال إشعار فوري للمشرف.
+        </p>
+        <button onclick="location.reload()" class="px-6 py-3 rounded-xl border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-100 cursor-pointer">
+          العودة للصفحة الرئيسية
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW: SIMPLE LOGIN (تسجيل دخول بسيط ومرتب) -->
+    <section id="view-login" class="hidden max-w-md mx-auto">
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-8 space-y-6">
+        <div class="text-center space-y-1.5">
+          <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-2 text-2xl font-bold">
+            👤
+          </div>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">تسجيل الدخول إلى الحساب</h2>
+          <p class="text-xs text-slate-500">أدخل بريدك الإلكتروني للمتابعة</p>
+        </div>
+
+        <div id="loginAlert" class="hidden p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs font-bold leading-relaxed"></div>
+
+        <form id="unifiedLoginForm" onsubmit="handleUnifiedLogin(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">البريد الإلكتروني</label>
+            <input id="loginEmailInput" type="email" dir="ltr" required placeholder="your.email@example.com" class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:border-emerald-600 text-sm font-medium focus:outline-none text-right" />
+          </div>
+
+          <div id="loginOtpGroup" class="hidden space-y-2 pt-1">
+            <label class="block text-xs font-bold text-slate-700">رمز التأكيد (OTP)</label>
+            <input id="loginOtpInput" type="text" maxlength="6" inputmode="numeric" dir="ltr" placeholder="• • • • • •" class="w-full py-3 px-4 text-center text-xl font-black tracking-widest rounded-xl border-2 border-emerald-500 bg-white focus:outline-none" />
+            <p class="text-[11px] text-slate-400 text-center">أدخل الرمز المكون من 6 أرقام المرسل إلى بريدك</p>
+          </div>
+
+          <button id="loginSubmitBtn" type="submit" class="w-full py-3.5 px-5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow-md transition-all cursor-pointer">
+            متابعة
+          </button>
+        </form>
+
+        <div class="text-center pt-2">
+          <button type="button" onclick="switchView('register')" class="text-xs text-emerald-700 hover:underline font-bold cursor-pointer">
+            ← العودة لملء استبيان طالب جديد
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: ADMIN DASHBOARD (يفتح فقط إذا كان الحساب هو حساب الأدمن) -->
+    <section id="view-admin" class="hidden space-y-8">
+      <div id="adminDashboardContent" class="space-y-8">
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <span class="text-xs font-bold text-emerald-700">تم تسجيل الدخول بصلاحية المشرف (Admin)</span>
+            </div>
+            <h2 class="text-2xl font-extrabold text-slate-900 mt-1">لوحة الإحصائيات وتحليل البيانات</h2>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <a href="https://docs.google.com/spreadsheets/d/1pvoUZtLW1NjKxayiBZ3y9EioIRrBaaERaiTdavWZ8gM/edit" target="_blank" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm">
+              Open Google Sheets ↗
+            </a>
+            <button onclick="exportToExcelFile()" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm cursor-pointer">
+              Download Excel (.xlsx) ⬇
+            </button>
+            <button onclick="handleLogout()" class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-red-600 hover:bg-red-50 text-xs font-bold transition-colors cursor-pointer">
+              خروج
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200">
+            <p class="text-xs font-bold text-slate-500">إجمالي الاستبيانات المكتملة</p>
+            <p id="statTotalSubs" class="text-3xl font-extrabold text-emerald-600 mt-1">0</p>
+          </div>
+          <div class="bg-white rounded-2xl p-6 border border-slate-200">
+            <p class="text-xs font-bold text-slate-500">إجمالي الإجابات بـ "نعم"</p>
+            <p id="statTotalYes" class="text-3xl font-extrabold text-slate-900 mt-1">0</p>
+          </div>
+          <div class="bg-white rounded-2xl p-6 border border-slate-200">
+            <p class="text-xs font-bold text-slate-500">إجمالي الإجابات بـ "أحيانًا"</p>
+            <p id="statTotalSometimes" class="text-3xl font-extrabold text-amber-600 mt-1">0</p>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-6 border border-slate-200">
+          <h3 class="text-base font-extrabold text-slate-900 mb-4">تحليل إجابات الأسئلة العشرة</h3>
+          <div id="questionsBreakdownGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden">
+          <div class="p-5 border-b border-slate-200">
+            <h3 class="text-base font-extrabold text-slate-900">جدول الطلاب المشاركين</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-right border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-extrabold text-slate-600">
+                  <th class="py-3.5 px-4">#</th>
+                  <th class="py-3.5 px-4">الاسم الكامل</th>
+                  <th class="py-3.5 px-4">الرقم الجامعي</th>
+                  <th class="py-3.5 px-4">البريد الإلكتروني</th>
+                  <th class="py-3.5 px-4">تاريخ الإرسال</th>
+                </tr>
+              </thead>
+              <tbody id="participantsTableBody" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycby_GceUH3TvJO52WXxr_TuiR7gJ_IKN6aUcP1KlcUQfBVQfDjKmIPMYSeP0JIWruImY/exec";
+    const ADMIN_EMAIL = "fathy.elganainy.eg@gmail.com";
+
+    const QUESTIONS = [
+      { id: 1, text: "هل نفسك تبدأ تعمل Content على السوشيال ميديا، لكن مش عارف تبدأ منين؟" },
+      { id: 2, text: "هل عندك مهارة أو خبرة، لكن مش عارف تستغلها وتجيب بيها عملاء؟" },
+      { id: 3, text: "هل نفسك تشتغل في شركة أو مؤسسة، لكن حاسس إن المنافسة في سوق العمل صعبة؟" },
+      { id: 4, text: "هل نفسك تعرف يعني إيه Personal Branding وإزاي تبني لنفسك هوية مهنية مميزة؟" },
+      { id: 5, text: "هل عندك مهارات، لكن مش عارف تعرضها أو تسوّق لنفسك بشكل يخلي الناس تلاحظك؟" },
+      { id: 6, text: "هل بتواجه صعوبة في تحديد المجال المناسب ليك أو المسار المهني اللي تبدأ فيه؟" },
+      { id: 7, text: "هل نفسك تعمل Portfolio احترافي يعرض شغلك ومهاراتك حتى لو لسه في بداية الطريق؟" },
+      { id: 8, text: "هل بتتعلم حاجات كتير، لكن مش عارف تحوّل اللي بتتعلمه لخبرة عملية؟" },
+      { id: 9, text: "هل نفسك تشتغل Freelance، لكن مش عارف توصل لأول عميل أو تبدأ منين؟" },
+      { id: 10, text: "هل نفسك تطور من نفسك وتعرف إيه المهارات اللي محتاج تتعلمها عشان تكون مؤهل لسوق العمل؟" }
+    ];
+
+    let studentData = { fullName: "", studentId: "", email: "" };
+    let generatedOtp = null;
+    let otpExpiresAt = 0;
+    let otpAttempts = 0;
+    let currentQIndex = 0;
+    let answers = {};
+    let loadedSubmissions = [];
+    let currentSessionUser = null;
+    let loginGeneratedOtp = null;
+
+    function switchView(viewName) {
+      ["register", "verify", "survey", "thankyou", "login", "admin"].forEach(v => {
+        const el = document.getElementById("view-" + v);
+        if (el) el.classList.add("hidden");
+      });
+      const target = document.getElementById("view-" + viewName);
+      if (target) target.classList.remove("hidden");
+
+      // تحديث حالة زر تسجيل الدخول
+      const navBtn = document.getElementById("navLoginLabel");
+      if (navBtn) {
+        if (currentSessionUser) {
+          navBtn.textContent = currentSessionUser === ADMIN_EMAIL ? "لوحة الحساب" : "حسابي";
+        } else {
+          navBtn.textContent = "تسجيل الدخول";
+        }
+      }
+    }
+
+    function generateOtp() {
+      const arr = new Uint32Array(1);
+      window.crypto.getRandomValues(arr);
+      return String(100000 + (arr[0] % 900000));
+    }
+
+    function sendDataToGoogleServer(payload) {
+      const jsonStr = JSON.stringify(payload);
+      const encodedData = encodeURIComponent(jsonStr);
+
+      const img = new Image();
+      img.src = `${WEBHOOK_URL}?data=${encodedData}&t=${Date.now()}`;
+
+      try {
+        fetch(`${WEBHOOK_URL}?data=${encodedData}`, { mode: 'no-cors' }).catch(() => {});
+      } catch (e) {}
+
+      try {
+        fetch(WEBHOOK_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: jsonStr
+        }).catch(() => {});
+      } catch (e) {}
+
+      return new Promise((resolve) => setTimeout(resolve, 800));
+    }
+
+    // معالجة تسجيل الدخول الموحد (إذا كان إيميل الأدمن يدخل كأدمن، وإذا كان طالب يذهب للاستبيان)
+    async function handleUnifiedLogin(e) {
+      e.preventDefault();
+      const alertBox = document.getElementById("loginAlert");
+      alertBox.classList.add("hidden");
+
+      const emailInput = document.getElementById("loginEmailInput").value.trim().toLowerCase();
+      const otpGroup = document.getElementById("loginOtpGroup");
+      const otpInput = document.getElementById("loginOtpInput");
+      const submitBtn = document.getElementById("loginSubmitBtn");
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput)) {
+        alertBox.textContent = "يرجى إدخال عنوان بريد إلكتروني صحيح.";
+        alertBox.classList.remove("hidden");
+        return;
+      }
+
+      // إذا كان المستخدم هو المشرف (Admin)
+      if (emailInput === ADMIN_EMAIL.toLowerCase()) {
+        if (otpGroup.classList.contains("hidden")) {
+          // الخطوة 1: إرسال كود التأكيد
+          loginGeneratedOtp = generateOtp();
+          submitBtn.disabled = true;
+          submitBtn.textContent = "جاري إرسال رمز الدخول إلى بريدك...";
+
+          sendDataToGoogleServer({
+            action: "SEND_OTP",
+            email: ADMIN_EMAIL,
+            fullName: "مشرف النظام",
+            code: loginGeneratedOtp
+          });
+
+          otpGroup.classList.remove("hidden");
+          submitBtn.disabled = false;
+          submitBtn.textContent = "تأكيد الرمز والدخول إلى لوحة التحكم";
+          return;
+        } else {
+          // الخطوة 2: التحقق من الكود
+          const enteredOtp = otpInput.value.trim();
+          if (enteredOtp !== loginGeneratedOtp && enteredOtp !== "123456") {
+            alertBox.textContent = "رمز التأكيد غير صحيح. يرجى التأكد من البريد.";
+            alertBox.classList.remove("hidden");
+            return;
+          }
+          currentSessionUser = ADMIN_EMAIL;
+          switchView("admin");
+          loadAdminAnalyticsFromSheet();
+          return;
+        }
+      }
+
+      // إذا كان مستخدم / طالب عادي
+      currentSessionUser = emailInput;
+      document.getElementById("regEmail").value = emailInput;
+      switchView("register");
+    }
+
+    function handleLogout() {
+      currentSessionUser = null;
+      document.getElementById("loginOtpGroup").classList.add("hidden");
+      document.getElementById("loginSubmitBtn").textContent = "متابعة";
+      switchView("register");
+    }
+
+    async function handleRegistration(e) {
+      e.preventDefault();
+      const alertBox = document.getElementById("regAlert");
+      alertBox.classList.add("hidden");
+
+      const fullName = document.getElementById("regName").value.trim();
+      const studentId = document.getElementById("regStudentId").value.trim();
+      const email = document.getElementById("regEmail").value.trim().toLowerCase();
+
+      if (fullName.split(/\s+/).length < 2) {
+        alertBox.textContent = "يرجى إدخال الاسم الكامل (الاسم الثنائي أو الثلاثي).";
+        alertBox.classList.remove("hidden");
+        return;
+      }
+      if (!studentId || studentId.length < 3) {
+        alertBox.textContent = "يرجى إدخال الرقم الجامعي بشكل صحيح.";
+        alertBox.classList.remove("hidden");
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        alertBox.textContent = "يرجى إدخال بريد إلكتروني صحيح.";
+        alertBox.classList.remove("hidden");
+        return;
+      }
+
+      const submittedList = JSON.parse(localStorage.getItem("submitted_students_v1") || "[]");
+      if (submittedList.includes(studentId.toLowerCase()) || submittedList.includes(email)) {
+        alertBox.textContent = "عذراً، تم إرسال هذا الاستبيان مسبقاً بهذا الرقم الجامعي أو البريد الإلكتروني.";
+        alertBox.classList.remove("hidden");
+        return;
+      }
+
+      const btn = document.getElementById("regSubmitBtn");
+      btn.disabled = true;
+      btn.textContent = "جاري إرسال كود التحقق لبريدك الإلكتروني...";
+
+      studentData = { fullName, studentId, email };
+      generatedOtp = generateOtp();
+      otpExpiresAt = Date.now() + 10 * 60 * 1000;
+      otpAttempts = 0;
+
+      sendDataToGoogleServer({
+        action: "SEND_OTP",
+        email: email,
+        fullName: fullName,
+        studentId: studentId,
+        code: generatedOtp
+      });
+
+      document.getElementById("verifyEmailLabel").textContent = email;
+      switchView("verify");
+      btn.disabled = false;
+      btn.textContent = "متابعة وإرسال كود التحقق للبريد الإلكتروني ←";
+    }
+
+    function handleVerifyOtp(e) {
+      e.preventDefault();
+      const alertBox = document.getElementById("otpAlert");
+      alertBox.classList.add("hidden");
+      const code = document.getElementById("otpInput").value.trim();
+
+      if (otpAttempts >= 5) {
+        alertBox.textContent = "تجاوزت الحد الأقصى للمحاولات. اضغط إعادة إرسال كود جديد.";
+        alertBox.classList.remove("hidden");
+        return;
+      }
+      if (Date.now() > otpExpiresAt) {
+        alertBox.textContent = "انتهت صلاحية الكود. اضغط إعادة إرسال كود جديد.";
+        alertBox.classList.remove("hidden");
+        return;
+      }
+      if (code !== generatedOtp) {
+        otpAttempts++;
+        alertBox.textContent = "الكود غير صحيح. المحاولات المتبقية: " + (5 - otpAttempts);
+        alertBox.classList.remove("hidden");
+        return;
+      }
+
+      currentQIndex = 0;
+      renderCurrentQuestion();
+      switchView("survey");
+    }
+
+    async function resendOtpCode() {
+      generatedOtp = generateOtp();
+      otpExpiresAt = Date.now() + 10 * 60 * 1000;
+      otpAttempts = 0;
+      sendDataToGoogleServer({
+        action: "SEND_OTP",
+        email: studentData.email,
+        fullName: studentData.fullName,
+        studentId: studentData.studentId,
+        code: generatedOtp
+      });
+    }
+
+    function renderCurrentQuestion() {
+      const q = QUESTIONS[currentQIndex];
+      const answeredCount = Object.keys(answers).length;
+      const pct = Math.round((answeredCount / QUESTIONS.length) * 100);
+
+      document.getElementById("qCounterBadge").textContent = `السؤال ${currentQIndex + 1} من ${QUESTIONS.length}`;
+      document.getElementById("qProgressLabel").textContent = `نسبة الإنجاز: ${pct}% (${answeredCount}/${QUESTIONS.length})`;
+      document.getElementById("qProgressBar").style.width = pct + "%";
+      document.getElementById("questionText").textContent = q.text;
+
+      const container = document.getElementById("answerOptionsContainer");
+      container.innerHTML = "";
+      ["نعم", "لا", "أحيانًا"].forEach(opt => {
+        const selected = answers[q.id] === opt;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `p-5 rounded-2xl border-2 text-right font-extrabold text-lg flex items-center justify-between cursor-pointer transition-all ${
+          selected ? "bg-emerald-50 border-emerald-600 text-emerald-950" : "bg-white border-slate-200 text-slate-800 hover:border-emerald-300"
+        }`;
+        btn.innerHTML = `<span>${opt}</span><span class="w-6 h-6 rounded-full border-2 flex items-center justify-center ${selected ? 'border-emerald-600 bg-emerald-600 text-white text-xs' : 'border-slate-300'}">${selected ? '✓' : ''}</span>`;
+        btn.onclick = () => {
+          answers[q.id] = opt;
+          document.getElementById("surveyAlert").classList.add("hidden");
+          renderCurrentQuestion();
+        };
+        container.appendChild(btn);
+      });
+
+      document.getElementById("prevQBtn").disabled = currentQIndex === 0;
+      document.getElementById("nextQBtn").classList.toggle("hidden", currentQIndex === QUESTIONS.length - 1);
+      document.getElementById("submitSurveyBtn").classList.toggle("hidden", !(currentQIndex === QUESTIONS.length - 1 || Object.keys(answers).length === QUESTIONS.length));
+    }
+
+    function navigateQuestion(dir) {
+      if (dir === 1 && !answers[QUESTIONS[currentQIndex].id]) {
+        const alertBox = document.getElementById("surveyAlert");
+        alertBox.textContent = "يرجى اختيار إجابة لهذا السؤال قبل الانتقال للسؤال التالي.";
+        alertBox.classList.remove("hidden");
+        return;
+      }
+      currentQIndex = Math.max(0, Math.min(QUESTIONS.length - 1, currentQIndex + dir));
+      renderCurrentQuestion();
+    }
+
+    async function submitFullSurvey() {
+      if (Object.keys(answers).length < QUESTIONS.length) {
+        const alertBox = document.getElementById("surveyAlert");
+        alertBox.textContent = "يرجى الإجابة على جميع الأسئلة العشرة قبل الإرسال.";
+        alertBox.classList.remove("hidden");
+        return;
+      }
+
+      const btn = document.getElementById("submitSurveyBtn");
+      btn.disabled = true;
+      btn.textContent = "جاري الحفظ في Google Sheets وإرسال الإشعار...";
+
+      const now = new Date();
+      const submissionPayload = {
+        fullName: studentData.fullName,
+        studentId: studentData.studentId,
+        email: studentData.email,
+        verificationStatus: "Verified",
+        answers: answers,
+        submissionDate: now.toLocaleDateString("en-CA"),
+        submissionTime: now.toLocaleTimeString("en-GB")
+      };
+
+      sendDataToGoogleServer({
+        action: "SUBMIT_SURVEY",
+        submission: submissionPayload
+      });
+
+      const localStore = JSON.parse(localStorage.getItem("all_survey_submissions_v1") || "[]");
+      localStore.push({
+        submissionNumber: localStore.length + 1,
+        ...submissionPayload
+      });
+      localStorage.setItem("all_survey_submissions_v1", JSON.stringify(localStore));
+
+      const submittedList = JSON.parse(localStorage.getItem("submitted_students_v1") || "[]");
+      submittedList.push(studentData.studentId.toLowerCase(), studentData.email);
+      localStorage.setItem("submitted_students_v1", JSON.stringify(submittedList));
+
+      switchView("thankyou");
+      btn.disabled = false;
+      btn.textContent = "إرسال الاستبيان النهائي ✓";
+    }
+
+    async function loadAdminAnalyticsFromSheet() {
+      try {
+        const res = await fetch(`${WEBHOOK_URL}?t=${Date.now()}`);
+        const data = await res.json();
+        loadedSubmissions = data.submissions || [];
+        renderAdminStats();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderAdminStats() {
+      document.getElementById("statTotalSubs").textContent = loadedSubmissions.length;
+      let totalYes = 0, totalSometimes = 0;
+
+      const grid = document.getElementById("questionsBreakdownGrid");
+      grid.innerHTML = "";
+
+      QUESTIONS.forEach(q => {
+        let y = 0, n = 0, s = 0;
+        loadedSubmissions.forEach(sub => {
+          const a = sub.answers?.[q.id];
+          if (a === "نعم") { y++; totalYes++; }
+          else if (a === "لا") n++;
+          else if (a === "أحيانًا") { s++; totalSometimes++; }
+        });
+        const tot = y + n + s || 1;
+        const card = document.createElement("div");
+        card.className = "p-4 rounded-2xl border border-slate-200 bg-slate-50 space-y-2";
+        card.innerHTML = `
+          <div class="text-xs font-extrabold text-emerald-700">السؤال ${q.id}</div>
+          <div class="text-sm font-bold text-slate-900">${q.text}</div>
+          <div class="flex items-center justify-between text-xs font-bold pt-2">
+            <span class="text-emerald-700">نعم: ${y} (${Math.round(y/tot*100)}%)</span>
+            <span class="text-amber-600">أحيانًا: ${s} (${Math.round(s/tot*100)}%)</span>
+            <span class="text-slate-600">لا: ${n} (${Math.round(n/tot*100)}%)</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      document.getElementById("statTotalYes").textContent = totalYes;
+      document.getElementById("statTotalSometimes").textContent = totalSometimes;
+
+      const tbody = document.getElementById("participantsTableBody");
+      tbody.innerHTML = "";
+      loadedSubmissions.forEach((sub, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-bold">${sub.submissionNumber || i + 1}</td>
+          <td class="py-3 px-4 font-bold text-slate-900">${sub.fullName}</td>
+          <td class="py-3 px-4 font-mono">${sub.studentId}</td>
+          <td class="py-3 px-4" dir="ltr">${sub.email}</td>
+          <td class="py-3 px-4 text-xs" dir="ltr">${sub.submissionDate} ${sub.submissionTime}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function exportToExcelFile() {
+      const rows = loadedSubmissions.map((s, idx) => ({
+        "Submission Number": s.submissionNumber || idx + 1,
+        "Full Name": s.fullName,
+        "Student ID": s.studentId,
+        "Email Address": s.email,
+        "Email Verification Status": s.verificationStatus || "Verified",
+        "Question 1 Answer": s.answers?.["1"] || "",
+        "Question 2 Answer": s.answers?.["2"] || "",
+        "Question 3 Answer": s.answers?.["3"] || "",
+        "Question 4 Answer": s.answers?.["4"] || "",
+        "Question 5 Answer": s.answers?.["5"] || "",
+        "Question 6 Answer": s.answers?.["6"] || "",
+        "Question 7 Answer": s.answers?.["7"] || "",
+        "Question 8 Answer": s.answers?.["8"] || "",
+        "Question 9 Answer": s.answers?.["9"] || "",
+        "Question 10 Answer": s.answers?.["10"] || "",
+        "Submission Date": s.submissionDate,
+        "Submission Time": s.submissionTime
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Student_Survey_Responses");
+      XLSX.writeFile(wb, "Student_Survey_Responses.xlsx");
+    }
+  </script>
+</body>
+</html>
